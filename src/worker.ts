@@ -40,6 +40,7 @@ export class RobotDO extends DurableObject<Env> {
   async alarm(): Promise<void> {
     const next = await this.robot.tick();
     await this.ctx.storage.setAlarm(Date.now() + next);
+    this.ctx.waitUntil(this.robot.reportsDone()); // reports never hold up the next poll
   }
 }
 

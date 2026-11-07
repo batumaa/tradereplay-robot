@@ -92,8 +92,9 @@ export async function handle(request: Request, env: Env, robot: Robot): Promise<
   }
   if (path === "/resume" && request.method === "POST") {
     if (!(await owner(request, env, robot))) return json({ error: "unauthorized" }, 401);
-    await robot.resume();
-    return json({ resumed: true });
+    const r = await robot.resume();
+    if (!r.ok) return json({ error: r.error }, 502);
+    return json({ resumed: true, ...(r.waiting ? { waiting: r.waiting } : {}) });
   }
   if (path === "/limits" && request.method === "POST") {
     if (!(await owner(request, env, robot))) return json({ error: "unauthorized" }, 401);
